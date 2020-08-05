@@ -1,0 +1,35 @@
+public class CaseTriggerHandler extends TriggerHandler {
+    protected override void beforeInsert(){
+        preventCreateCase((List<Case>)Trigger.new);
+        
+    }
+    
+    private static void preventCreateCase(List<Case> newList){
+        
+        Set<String> setSubject = new Set<String>();
+        Set<Id> idSet = new Set<Id>();
+        for(Case case_i:newList){
+            System.debug('subject = ' + case_i.Subject);
+            setSubject.add(case_i.Subject);
+            idSet.add(case_i.AccountId);
+        }
+        
+        
+        if(setSubject.size() > 0){
+            List<Case> caseList = [SELECT Subject, AccountId FROM Case WHERE Subject in :setSubject AND AccountId =: idSet];
+            Map<String ,Case> mapSubject = new Map<String,Case>();
+            
+            for(Case case_i: caseList){
+                mapSubject.put(case_i.Subject,case_i);
+            }
+            for(Case case_i:newList){
+                if(mapSubject.containsKey(case_i.Subject)){
+                    case_i.addError('You can`t create a case with the same subject');
+                }
+            }
+        }
+        
+        
+    }
+    
+}
