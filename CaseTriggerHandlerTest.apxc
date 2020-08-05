@@ -1,0 +1,27 @@
+@isTest
+public class CaseTriggerHandlerTest {
+    @isTest private static void preventCreateTest(){
+        Account testAccount = new Account(Name = 'Test');
+        insert testAccount;
+        Case caseTestInsert = new Case(AccountId = testAccount.Id, Origin = 'Email', Status='New', Subject='Test2');
+        insert caseTestInsert;
+        
+        
+        
+        Case testCase = new Case(AccountId = testAccount.Id, Origin = 'Email', Status='New', Subject='Test2');
+        
+        
+        try{
+            insert testCase;
+            
+        }catch(Exception error) {
+            
+            System.assert(error.getMessage().contains('Insert failed.'));
+            System.assert(error.getMessage().contains('FIELD_CUSTOM_VALIDATION_EXCEPTION'));
+            System.assert(error.getMessage().contains('You can`t create a case with the same subject')
+                         );
+        }
+        
+        
+    }
+}
