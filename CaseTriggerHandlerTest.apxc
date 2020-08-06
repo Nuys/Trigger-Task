@@ -33,7 +33,7 @@ public class CaseTriggerHandlerTest {
         
         for(DataBase.SaveResult sr_i: sr){
             System.assert(!sr_i.isSuccess());
-        System.assert(sr_i.getErrors().size() > 0);
+            System.assert(sr_i.getErrors().size() > 0);
             for(Database.Error err: sr_i.getErrors()){
                 System.assertEquals(System.StatusCode.FIELD_CUSTOM_VALIDATION_EXCEPTION, err.statuscode);
                 System.assert(err.getMessage().contains('You can`t create a case with the same subject'));
