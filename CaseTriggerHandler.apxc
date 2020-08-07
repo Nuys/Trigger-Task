@@ -5,31 +5,54 @@ public class CaseTriggerHandler extends TriggerHandler {
     }
     
     private static void preventCreateCase(List<Case> newList){
-        
+        Integer count = 0;
         Set<String> setSubject = new Set<String>();
         Set<Id> idSet = new Set<Id>();
         for(Case case_i:newList){
-            System.debug('subject = ' + case_i.Subject);
             setSubject.add(case_i.Subject);
             idSet.add(case_i.AccountId);
         }
         
         
         if(setSubject.size() > 0){
-            List<Case> caseList = [SELECT Subject, AccountId FROM Case WHERE Subject in :setSubject AND AccountId =: idSet];
+            Map<String, Case> mapForListNew = new Map<String,Case>();
+            for(Case case_i:newList){
+                mapForListNew.put(case_i.Subject,case_i);
+                if(mapForListNew.containsKey(case_i.Subject)){
+                    count++;
+                }
+            }
+            
+            List<Case> caseList = [SELECT Subject, AccountId FROM Case WHERE Subject in :setSubject AND AccountId =: idSet ];
             Map<String ,Case> mapSubject = new Map<String,Case>();
+            
+            
             
             for(Case case_i: caseList){
                 mapSubject.put(case_i.Subject,case_i);
             }
-            for(Case case_i:newList){
-                if(mapSubject.containsKey(case_i.Subject)){
+            
+            List<Case> newListCaseToAddError = new List<Case>();  
+            if(count>1){
+                for(Integer i = 1 ;i<newList.size();i++){
+                    newListCaseToAddError.add(newList.get(i));
+                }
+                System.debug(newListCaseToAddError.size());
+                for(Case case_i:newListCaseToAddError){
+                    System.debug('before add error' + case_i);
                     case_i.addError('You can`t create a case with the same subject');
+                    System.debug('after add error' + case_i.Subject);
+                }
+                newList.get(0);
+                System.debug(newList.size());
+            }
+            else {
+                for(Case case_i:newList){
+                    if(mapSubject.containsKey(case_i.Subject)){
+                        case_i.addError('You can`t create a case');
+                    }
                 }
             }
         }
-        
-        
     }
-    
 }
