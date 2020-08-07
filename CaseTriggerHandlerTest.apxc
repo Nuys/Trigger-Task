@@ -23,8 +23,25 @@ public class CaseTriggerHandlerTest {
             Case newTestCases = new Case(AccountId = testAccount.Id, Origin = 'Email', Status='New', Subject='TestArray');
             caseList.add(newTestCases);
         }
-		Database.insert(caseList, false);
+        Database.insert(caseList, false);
         List <Case> selectList = [SELECT Id FROM Case];
-        System.assertEquals(1, selectList.size());
+        System.assertEquals(1, selectList.size());   
+    }
+    @isTest private static void preventUpdateReccord(){
+        Account testAccount = new Account (Name='TestUpdate');
+        insert testAccount;
+        Case firstTestCase = new Case (AccountId = testAccount.Id, Origin = 'Email', Status='New', Subject='TestUpdateCase');
+        insert firstTestCase;
+        Case secondTestCase = new Case (AccountId = testAccount.Id, Origin = 'Email', Status='New', Subject='TestUpdateCase2');
+        insert secondTestCase;
+        secondTestCase.Subject = 'TestUpdateCase';
+        Database.SaveResult sr = Database.update(secondTestCase, false);
+        System.assert(!sr.isSuccess());
+        System.assert(sr.getErrors().size() > 0);
+        
+        for(Database.Error err: sr.getErrors()){
+            System.assertEquals(System.StatusCode.FIELD_CUSTOM_VALIDATION_EXCEPTION, err.statuscode);
+            System.assert(err.getMessage().contains('You can`t create a case'));
+        } 
     }
 }
