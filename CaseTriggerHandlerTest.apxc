@@ -12,7 +12,7 @@ public class CaseTriggerHandlerTest {
         
         for(Database.Error err: sr.getErrors()){
             System.assertEquals(System.StatusCode.FIELD_CUSTOM_VALIDATION_EXCEPTION, err.statuscode);
-            System.assert(err.getMessage().contains('You can`t create a case'));
+            System.assert(err.getMessage().contains('You can`t create a case with the same subject'));
         } 
     }
     @isTest private static void preventInsertArray(){
@@ -41,7 +41,7 @@ public class CaseTriggerHandlerTest {
         
         for(Database.Error err: sr.getErrors()){
             System.assertEquals(System.StatusCode.FIELD_CUSTOM_VALIDATION_EXCEPTION, err.statuscode);
-            System.assert(err.getMessage().contains('You can`t create a case'));
+            System.assert(err.getMessage().contains('You can`t create a case with the same subject'));
         } 
     }
 }
