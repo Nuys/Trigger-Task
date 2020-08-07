@@ -5,9 +5,6 @@ public class CaseTriggerHandlerTest {
         insert testAccount;
         Case caseTestInsert = new Case(AccountId = testAccount.Id, Origin = 'Email', Status='New', Subject='Test2');
         insert caseTestInsert;
-        
-        
-        
         Case testCase = new Case(AccountId = testAccount.Id, Origin = 'Email', Status='New', Subject='Test2');
         Database.SaveResult sr = Database.insert(testCase, false);
         System.assert(!sr.isSuccess());
@@ -15,29 +12,19 @@ public class CaseTriggerHandlerTest {
         
         for(Database.Error err: sr.getErrors()){
             System.assertEquals(System.StatusCode.FIELD_CUSTOM_VALIDATION_EXCEPTION, err.statuscode);
-            System.assert(err.getMessage().contains('You can`t create a case with the same subject'));
+            System.assert(err.getMessage().contains('You can`t create a case'));
         } 
     }
     @isTest private static void preventInsertArray(){
         Account testAccount = new Account(Name = 'TestArray');
         insert testAccount;
-        Case caseTestInsert = new Case(AccountId = testAccount.Id, Origin = 'Email', Status='New', Subject='TestArray');
-        insert caseTestInsert;
-        
         List<Case> caseList = new List<Case>();
         for(Integer i = 0 ; i < 10 ; i++){
             Case newTestCases = new Case(AccountId = testAccount.Id, Origin = 'Email', Status='New', Subject='TestArray');
             caseList.add(newTestCases);
         }
-        Database.SaveResult[] sr = Database.insert(caseList, false);
-        
-        for(DataBase.SaveResult sr_i: sr){
-            System.assert(!sr_i.isSuccess());
-            System.assert(sr_i.getErrors().size() > 0);
-            for(Database.Error err: sr_i.getErrors()){
-                System.assertEquals(System.StatusCode.FIELD_CUSTOM_VALIDATION_EXCEPTION, err.statuscode);
-                System.assert(err.getMessage().contains('You can`t create a case with the same subject'));
-            } 
-        }
+		Database.insert(caseList, false);
+        List <Case> selectList = [SELECT Id FROM Case];
+        System.assertEquals(1, selectList.size());
     }
 }
