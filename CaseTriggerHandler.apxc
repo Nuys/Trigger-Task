@@ -1,7 +1,9 @@
 public class CaseTriggerHandler extends TriggerHandler {
     protected override void beforeInsert(){
         preventCreateCase((List<Case>)Trigger.new);
-        
+    }
+    protected override void beforeUpdate(){
+        preventCreateCase((List<Case>)Trigger.new);
     }
     
     private static void preventCreateCase(List<Case> newList){
